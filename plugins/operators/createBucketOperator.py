@@ -1,6 +1,5 @@
 from airflow.sdk import BaseOperator
 import boto3
-from botocore.client import Config
 
 class createBucketOperator(BaseOperator):
     def __init__(self,bucket_name, access_key, secret_key, endpoint_url, **kwargs):
@@ -17,12 +16,11 @@ class createBucketOperator(BaseOperator):
         aws_access_key_id=self.access_key,
         aws_secret_access_key=self.secret_key
         )
-
         try:
             bucket = s3.Bucket(self.bucket_name)
-            
             if bucket.creation_date:
                 self.log.info("bucket exists") 
+                
             else:    
                 s3.create_bucket(Bucket=self.bucket_name)       
                 self.log.info(f"Bucket {self.bucket_name} created successfully")

@@ -1,6 +1,5 @@
 from airflow.sdk import BaseOperator
 import boto3
-from botocore.client import Config
 
 class loadDataToBucketOperator(BaseOperator):
     def __init__(self, bucket_name, object_path, object_name, access_key, secret_key, endpoint_url, **kwargs):

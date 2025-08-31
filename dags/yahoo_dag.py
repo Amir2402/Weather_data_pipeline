@@ -1,6 +1,7 @@
 from airflow.decorators import dag
 from plugins.operators.createBucketOperator import createBucketOperator
 from plugins.operators.loadDataToBucketOperator import loadDataToBucketOperator
+from plugins.operators.loadDailyWeatherData import LoadDailyWeatherData
 from plugins.helpers.variables import MINIO_ACCESS_KEY, MINIO_SECRET_KEY, ENDPOINT_URL
 from datetime import datetime
 
@@ -45,7 +46,13 @@ def generate_dag():
         endpoint_url = ENDPOINT_URL
     )
 
+    load_daily_weather_data = LoadDailyWeatherData(
+        task_id = "load_daily_weather_data", 
+        access_key = MINIO_ACCESS_KEY, 
+        secret_key = MINIO_SECRET_KEY, 
+        endpoint_url = ENDPOINT_URL
+    )
 
-    create_bronze_bukcet >> create_silver_bukcet >>  create_gold_bukcet >> load_lat_long_to_bronze
+    [create_bronze_bukcet >> create_silver_bukcet >>  create_gold_bukcet] >> load_lat_long_to_bronze >> load_daily_weather_data
 
 generate_dag()
