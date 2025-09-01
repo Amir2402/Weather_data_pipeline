@@ -69,7 +69,8 @@ def generate_dag():
 
     [create_bronze_bukcet, create_silver_bukcet, create_gold_bukcet] >> load_lat_long_to_bronze >> check_today_weather
     check_today_weather >> [load_daily_weather_data, skip_task]
-    load_daily_weather_data >> skip_task
+    
+    
 
 
 generate_dag()

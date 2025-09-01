@@ -15,10 +15,8 @@ con.execute(f"SET s3_endpoint='minio:9000'")
 con.execute(f"SET s3_use_ssl=false;")
 con.execute(f"SET s3_url_style='path';")
 
-
-df = con.execute("""
+df = con.sql("""
     SELECT * 
-    FROM read_json('s3://bronze/daily_temp_data_8_31_2025.json'); 
-""").fetchdf()
-
-print(df)
+    FROM read_json_auto('s3://bronze/daily_temp_data_8_31_2025.json');
+""")
+df.show()

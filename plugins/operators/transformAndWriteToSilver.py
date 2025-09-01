@@ -11,4 +11,5 @@ class transformAndWriteToSilver(BaseOperator):
         self.conn = duckcdS3Connection(access_key, secret_key)
     
     def execute(): 
-        pass
+        pass 
+    
