@@ -1,8 +1,12 @@
 from airflow.decorators import dag
+from airflow.operators.python import BranchPythonOperator
+from airflow.operators.empty import EmptyOperator
 from plugins.operators.createBucketOperator import createBucketOperator
 from plugins.operators.loadDataToBucketOperator import loadDataToBucketOperator
 from plugins.operators.loadDailyWeatherData import LoadDailyWeatherData
 from plugins.helpers.variables import MINIO_ACCESS_KEY, MINIO_SECRET_KEY, ENDPOINT_URL
+from include.utils.TodayWeatherCheck import weather_exist
+
 from datetime import datetime
 
 # Define the DAG
@@ -53,6 +57,19 @@ def generate_dag():
         endpoint_url = ENDPOINT_URL
     )
 
-    [create_bronze_bukcet >> create_silver_bukcet >>  create_gold_bukcet] >> load_lat_long_to_bronze >> load_daily_weather_data
+    check_today_weather = BranchPythonOperator(
+        task_id = "check_today_weather", 
+        python_callable = weather_exist
+
+    )
+
+    skip_task = EmptyOperator(
+        task_id = "skip_task"
+    )
+
+    [create_bronze_bukcet, create_silver_bukcet, create_gold_bukcet] >> load_lat_long_to_bronze >> check_today_weather
+    check_today_weather >> [load_daily_weather_data, skip_task]
+    load_daily_weather_data >> skip_task
+
 
 generate_dag()
