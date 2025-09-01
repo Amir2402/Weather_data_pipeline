@@ -11,7 +11,6 @@ def weather_exist():
 
     object_name = f"daily_temp_data_{today_month}_{today_day}_{today_year}.json"
     bucket_name = "bronze"
-
     try: 
         s3 = boto3.client(
             "s3",

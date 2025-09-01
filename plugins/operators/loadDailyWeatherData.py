@@ -1,6 +1,5 @@
 from airflow.sdk import BaseOperator
 import boto3
-from botocore.client import Config
 import requests as rq 
 import json 
 from datetime import datetime 
