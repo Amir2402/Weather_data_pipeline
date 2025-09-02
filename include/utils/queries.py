@@ -26,8 +26,15 @@ def filter_weather_view(current_hour):
                     weather_table)
             WHERE 
                 hour(temperature_datetime) = {current_hour};
-"""
+    """
     return filtered_weather
+
+def write_to_silver_layer(current_year, current_month, current_day, current_hour):
+    write_to_silver_query = f"""
+        COPY joined_lat_long_weather_table 
+        TO 's3://silver/silver_weather_data/{current_year}/{current_month}/{current_day}/{current_hour}.parquet' (FORMAT parquet);
+    """
+    return write_to_silver_query
 
 read_data_into_lat_long_table = """
     CREATE TABLE lat_long_table AS 
@@ -35,15 +42,16 @@ read_data_into_lat_long_table = """
             *
         FROM 
             read_csv('s3://bronze/latitude_longitude.csv', header = true);
-"""
+    """
 
 joined_weather_country = """
-    SELECT 
-        *
-    FROM 
-        weather_data_view wdv
-    JOIN 
-        lat_long_table llt 
-    ON 
-        wdv.latitude = llt.latitude; 
-"""
+    CREATE TABLE joined_lat_long_weather_table AS 
+        SELECT 
+            *
+        FROM 
+            weather_data_view wdv
+        JOIN 
+            lat_long_table llt 
+        ON 
+            wdv.latitude = llt.latitude; 
+    """

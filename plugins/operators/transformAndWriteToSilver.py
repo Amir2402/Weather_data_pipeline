@@ -1,5 +1,7 @@
 from airflow.sdk import BaseOperator
-from include.utils.queries import read_data_into_weather_table, filter_weather_view, read_data_into_lat_long_table, joined_weather_country
+from include.utils.queries import (read_data_into_weather_table, filter_weather_view,
+                                   read_data_into_lat_long_table, joined_weather_country,
+                                   write_to_silver_layer)
 import boto3
 import json 
 import duckdb 
@@ -24,8 +26,11 @@ class transformAndWriteToSilver(BaseOperator):
         self.conn.sql(filter_weather_view(self.current_hour))
         self.log.info("flatenned json data and filtered with current hour")
         
-        self.conn.sql(joined_weather_country).show()
+        self.conn.sql(joined_weather_country)
         self.log.info("joined latitude longitude table with weather table")
+        
+        self.conn.execute(write_to_silver_layer(self.current_year, self.current_month, self.current_day, self.current_hour))
+        self.log.info("loaded weather data to S3 successfully!")
     
     def connect_duck_db_to_S3(self, access_key, secret_key):
         conn = duckdb.connect()

@@ -13,7 +13,8 @@ from datetime import datetime
 @dag(
     dag_id = "meda_pipeline", 
     start_date = datetime(2021, 10, 10),
-    catchup = False
+    catchup = False,
+    schedule = '@hourly'
 )
 def generate_dag(): 
     create_bronze_bukcet = createBucketOperator(
