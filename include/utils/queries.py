@@ -1,38 +1,41 @@
-read_data_into_weather_table = """
-    CREATE TABLE weather_table AS 
-    SELECT 
-        UNNEST(result) AS weather_data
-    FROM 
-        read_json('s3://bronze/daily_temp_data_8_31_2025.json');
-"""
+def read_data_into_weather_table(today_year, today_month, today_day): 
+    read_data_into_weather_table = f"""
+        CREATE TABLE weather_table AS 
+            SELECT 
+                UNNEST(result) AS weather_data
+            FROM 
+                read_json('s3://bronze/daily_temp_data_{today_month}_{today_day}_{today_year}.json');
+    """
+    return read_data_into_weather_table
 
-read_data_into_lat_long = """
-    CREATE TABLE lat_long_table AS 
-    SELECT 
-        *
-    FROM 
-        read_csv('s3://bronze/latitude_longitude.csv', header = true);
-"""
-def filtered_weather_view(current_hour): 
+def filter_weather_view(current_hour): 
     filtered_weather = f"""
         CREATE VIEW weather_data_view AS
-        SELECT * 
-        FROM (
-            SELECT
-                weather_data.latitude,
-                weather_data.longitude, 
-                weather_data.utc_offset_seconds, 
-                weather_data.timezone, 
-                weather_data.timezone_abbreviation, 
-                weather_data.elevation, 
-                CAST(UNNEST(weather_data.hourly.time) AS TIMESTAMP) AS temperature_datetime, 
-                UNNEST(weather_data.hourly.temperature_2m) AS temperature
-            FROM 
-                weather_table)
-        WHERE 
-            hour(temperature_datetime) = {current_hour};
+            SELECT * 
+            FROM (
+                SELECT
+                    weather_data.latitude,
+                    weather_data.longitude, 
+                    weather_data.utc_offset_seconds, 
+                    weather_data.timezone, 
+                    weather_data.timezone_abbreviation, 
+                    weather_data.elevation, 
+                    CAST(UNNEST(weather_data.hourly.time) AS TIMESTAMP) AS temperature_datetime, 
+                    UNNEST(weather_data.hourly.temperature_2m) AS temperature
+                FROM 
+                    weather_table)
+            WHERE 
+                hour(temperature_datetime) = {current_hour};
 """
     return filtered_weather
+
+read_data_into_lat_long_table = """
+    CREATE TABLE lat_long_table AS 
+        SELECT 
+            *
+        FROM 
+            read_csv('s3://bronze/latitude_longitude.csv', header = true);
+"""
 
 joined_weather_country = """
     SELECT 
@@ -44,4 +47,3 @@ joined_weather_country = """
     ON 
         wdv.latitude = llt.latitude; 
 """
-

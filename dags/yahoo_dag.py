@@ -4,9 +4,9 @@ from airflow.operators.empty import EmptyOperator
 from plugins.operators.createBucketOperator import createBucketOperator
 from plugins.operators.loadDataToBucketOperator import loadDataToBucketOperator
 from plugins.operators.loadDailyWeatherData import LoadDailyWeatherData
+from plugins.operators.transformAndWriteToSilver import transformAndWriteToSilver
 from plugins.helpers.variables import MINIO_ACCESS_KEY, MINIO_SECRET_KEY, ENDPOINT_URL
 from include.utils.todayWeatherCheck import weather_exist
-
 from datetime import datetime
 
 # Define the DAG
@@ -66,8 +66,16 @@ def generate_dag():
         task_id = "skip_task"
     )
 
+    transform_and_write_to_silver = transformAndWriteToSilver(
+        task_id = "transform_and_write_to_silver",
+        trigger_rule='one_success',  
+        access_key = MINIO_ACCESS_KEY,
+        secret_key = MINIO_SECRET_KEY, 
+        today_date = datetime.now()
+    )
+
     [create_bronze_bukcet, create_silver_bukcet, create_gold_bukcet] >> load_lat_long_to_bronze >> check_today_weather
-    check_today_weather >> [load_daily_weather_data, skip_task]
+    check_today_weather >> [load_daily_weather_data, skip_task] >> transform_and_write_to_silver
     
     
 

@@ -53,7 +53,9 @@ class LoadDailyWeatherData(BaseOperator):
             
             if res.status_code == 200: 
                 self.log.info(res)
-                requests_results.append(json.loads(res.content))
+                weather_record = json.loads(res.content)
+                weather_record['latitude'], weather_record['longitude'] = lat, long         
+                requests_results.append(weather_record)
         
         return requests_results  
     
