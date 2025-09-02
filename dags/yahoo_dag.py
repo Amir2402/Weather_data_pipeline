@@ -5,7 +5,7 @@ from plugins.operators.createBucketOperator import createBucketOperator
 from plugins.operators.loadDataToBucketOperator import loadDataToBucketOperator
 from plugins.operators.loadDailyWeatherData import LoadDailyWeatherData
 from plugins.helpers.variables import MINIO_ACCESS_KEY, MINIO_SECRET_KEY, ENDPOINT_URL
-from include.utils.TodayWeatherCheck import weather_exist
+from include.utils.todayWeatherCheck import weather_exist
 
 from datetime import datetime
 
@@ -60,7 +60,6 @@ def generate_dag():
     check_today_weather = BranchPythonOperator(
         task_id = "check_today_weather", 
         python_callable = weather_exist
-
     )
 
     skip_task = EmptyOperator(
