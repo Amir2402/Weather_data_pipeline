@@ -2,8 +2,6 @@ from airflow.sdk import BaseOperator
 from include.utils.queries import (read_data_into_weather_table, filter_weather_view,
                                    read_data_into_lat_long_table, joined_weather_country,
                                    write_to_silver_layer)
-import boto3
-import json 
 import duckdb 
 
 class transformAndWriteToSilver(BaseOperator):
