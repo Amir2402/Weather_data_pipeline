@@ -1,45 +1,46 @@
-Overview
-========
+# 🌦️ Weather Data Pipeline  
 
-Welcome to Astronomer! This project was generated after you ran 'astro dev init' using the Astronomer CLI. This readme describes the contents of the project, as well as how to run Apache Airflow on your local machine.
+A modern data pipeline built with **Apache Airflow**, **duckdb** and **S3(Minio)** to fetch, process, and analyze weather data using the **Medallion Architecture** (Bronze → Silver → Gold).  
 
-Project Contents
-================
+This project demonstrates **best practices in data engineering**, including orchestration, incremental data processing, and building reproducible pipelines.  
 
-Your Astro project contains the following files and folders:
+---
 
-- dags: This folder contains the Python files for your Airflow DAGs. By default, this directory includes one example DAG:
-    - `example_astronauts`: This DAG shows a simple ETL pipeline example that queries the list of astronauts currently in space from the Open Notify API and prints a statement for each astronaut. The DAG uses the TaskFlow API to define tasks in Python, and dynamic task mapping to dynamically print a statement for each astronaut. For more on how this DAG works, see our [Getting started tutorial](https://www.astronomer.io/docs/learn/get-started-with-airflow).
-- Dockerfile: This file contains a versioned Astro Runtime Docker image that provides a differentiated Airflow experience. If you want to execute other commands or overrides at runtime, specify them here.
-- include: This folder contains any additional files that you want to include as part of your project. It is empty by default.
-- packages.txt: Install OS-level packages needed for your project by adding them to this file. It is empty by default.
-- requirements.txt: Install Python packages needed for your project by adding them to this file. It is empty by default.
-- plugins: Add custom or community plugins for your project to this file. It is empty by default.
-- airflow_settings.yaml: Use this local-only file to specify Airflow Connections, Variables, and Pools instead of entering them in the Airflow UI as you develop DAGs in this project.
+## 🚀 Features  
 
-Deploy Your Project Locally
-===========================
+- 📥 **Ingestion Layer (Bronze)**: Fetches daily/hourly weather data from Open-Meteo API and stores it in object storage (S3/MinIO).  
+- 🔄 **Transformation Layer (Silver)**: Cleans and normalizes raw JSON data into structured tables.  
+- 📊 **Analytics Layer (Gold)**: Aggregates and enriches weather data (e.g., temperature trends, rankings).  
+- ⚙️ **Orchestration with Airflow**: DAGs automate ingestion, transformation, and aggregation.  
+- 🛠️ **DuckDB** for local querying and transformations.  
+- 📦 **Dockerized Environment** for easy deployment (Astronomer-compatible).  
 
-Start Airflow on your local machine by running 'astro dev start'.
+---
 
-This command will spin up five Docker containers on your machine, each for a different Airflow component:
+## 🏗️ Architecture  
+      ┌───────────┐
+      │ OpenMeteo │
+      └─────┬─────┘
+            │
+      ┌─────▼─────┐
+      │   Bronze   │  → Raw JSON in S3/MinIO
+      └─────┬─────┘
+            │
+      ┌─────▼─────┐
+      │   Silver   │  → Cleaned structured tables (DuckDB)
+      └─────┬─────┘
+            │
+      ┌─────▼─────┐
+      │    Gold    │  → Aggregated analytics tables
+      └───────────┘
 
-- Postgres: Airflow's Metadata Database
-- Scheduler: The Airflow component responsible for monitoring and triggering tasks
-- DAG Processor: The Airflow component responsible for parsing DAGs
-- API Server: The Airflow component responsible for serving the Airflow UI and API
-- Triggerer: The Airflow component responsible for triggering deferred tasks
 
-When all five containers are ready the command will open the browser to the Airflow UI at http://localhost:8080/. You should also be able to access your Postgres Database at 'localhost:5432/postgres' with username 'postgres' and password 'postgres'.
+---
 
-Note: If you already have either of the above ports allocated, you can either [stop your existing Docker containers or change the port](https://www.astronomer.io/docs/astro/cli/troubleshoot-locally#ports-are-not-available-for-my-local-airflow-webserver).
+## ⚙️ Tech Stack  
 
-Deploy Your Project to Astronomer
-=================================
-
-If you have an Astronomer account, pushing code to a Deployment on Astronomer is simple. For deploying instructions, refer to Astronomer documentation: https://www.astronomer.io/docs/astro/deploy-code/
-
-Contact
-=======
-
-The Astronomer CLI is maintained with love by the Astronomer team. To report a bug or suggest a change, reach out to our support.
+- **Python** (Programming Language)  
+- **Apache Airflow** (Orchestration)  
+- **DuckDB** (SQL Processing Engine)  
+- **S3 / MinIO** (Object Storage)  
+- **Docker + Astro CLI** (deployment)  
