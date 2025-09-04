@@ -55,3 +55,35 @@ joined_weather_country = """
         ON 
             wdv.latitude = llt.latitude; 
     """
+
+country_count = """
+    SELECT 
+        COUNT(country) AS country_count
+    FROM    
+        weather_table; 
+    """
+
+countries_weather_rank = """
+    SELECT  
+        country, 
+        temperature, 
+        RANK() OVER(ORDER BY temperature DESC) AS country_rank 
+    FROM  
+        weather_table; 
+    """
+
+average_temperature = """
+    SELECT 
+        AVG(temperature)
+    FROM 
+        weather_table; 
+    """
+
+temperature_average_differece = """
+    SELECT 
+        country, 
+        temperature,
+        temperature - AVG(temperature) OVER(), 
+    FROM 
+        weather_table
+    """
